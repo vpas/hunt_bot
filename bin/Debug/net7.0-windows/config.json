@@ -1,0 +1,15 @@
+{
+  "CheckIntervalMs": 1000,
+  "keyMappings": {
+    "LEFT": "Q",
+    "RIGHT": "D",
+    "FORWARD": "W",
+    "SPRINT": "Tab"
+  },
+  "mouseSensitivity": 0.28442,
+  "Mode": "STRAFE_PREDICTABLY",
+  "StrafeRandomlyMinDurationMs": 300,
+  "StrafeRandomlyMaxDurationMs": 1000,
+  "StrafePredictablyDurationMs": 5000,
+  "SpringPredictablyDurationMs": 5000
+}

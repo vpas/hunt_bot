@@ -26,6 +26,90 @@ namespace hunt_bot {
         [DllImport("user32.dll")]
         private static extern IntPtr GetMessageExtraInfo();
 
+        private static Dictionary<string, int> scanCodes = new Dictionary<string, int>() {
+            {"ESC", 1 },
+            {"1", 2 },
+            {"2", 3 },
+            {"3", 4 },
+            {"4", 5 },
+            {"5", 6 },
+            {"6", 7 },
+            {"7", 8 },
+            {"8", 9 },
+            {"9", 10},
+            {"0", 11},
+            {"-", 12},
+            {"=", 13},
+            {"bs", 14},
+            {"Tab", 15},
+            {"Q", 16},
+            {"W", 17},
+            {"E", 18},
+            {"R", 19},
+            {"T", 20},
+            {"Y", 21},
+            {"U", 22},
+            {"I", 23},
+            {"O", 24},
+            {"P", 25},
+            {"[", 26},
+            {"]", 27},
+            {"Enter", 28},
+            {"CTRL", 29},
+            {"A", 30},
+            {"S", 31},
+            {"D", 32},
+            {"F", 33},
+            {"G", 34},
+            {"H", 35},
+            {"J", 36},
+            {"K", 37},
+            {"L", 38},
+            {";", 39},
+            {"'", 40},
+            {"`", 41},
+            {"LShift", 42},
+            {"Z", 44},
+            {"X", 45},
+            {"C", 46},
+            {"V", 47},
+            {"B", 48},
+            {"N", 49},
+            {"M", 50},
+            {",", 51},
+            {".", 52},
+            {"/", 53},
+            {"RShift", 54},
+            {"PrtSc", 55},
+            {"Alt", 56},
+            {"Space", 57},
+            {"Caps", 58},
+            {"F1", 59},
+            {"F2", 60},
+            {"F3", 61},
+            {"F4", 62},
+            {"F5", 63},
+            {"F6", 64},
+            {"F7", 65},
+            {"F8", 66},
+            {"F9", 67},
+            {"F10", 68},
+            {"Num", 69},
+            {"Scroll", 70},
+            {"Home (7)", 71},
+            {"Up (8)", 72},
+            {"PgUp (9)", 73},
+            {"Left (4)", 75},
+            {"Center (5)", 76},
+            {"Right (6)", 77},
+            {"+", 78},
+            {"End (1)", 79},
+            {"Down (2)", 80},
+            {"PgDn (3)", 81},
+            {"Ins", 82},
+            {"Del", 83},
+        };
+
         [Flags]
         public enum MouseEventFlags {
             LeftDown = 0x00000002,
@@ -124,7 +208,7 @@ namespace hunt_bot {
             PostMessage(handle, eventCode, key, 0);
         }
 
-        public static void SetKeyState(int key, bool isDown) {
+        public static void SetKeyState(string key, bool isDown) {
             KeyEventF keyEventF = isDown ? KeyEventF.KeyDown : KeyEventF.KeyUp;
             Input[] inputs = new Input[] {
                 new Input
@@ -135,7 +219,7 @@ namespace hunt_bot {
                         ki = new KeyboardInput
                         {
                             wVk = 0,
-                            wScan = (ushort)key,
+                            wScan = (ushort)scanCodes[key],
                             dwFlags = (uint)(keyEventF | KeyEventF.Scancode),
                             dwExtraInfo = GetMessageExtraInfo()
                         }
@@ -146,11 +230,44 @@ namespace hunt_bot {
             SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
         }
 
-        public static void HoldKey(int key, int durationMs) {
+        public static void MouseMove(int dx, int dy) {
+            Input[] inputs = new Input[]
+            {
+                new Input
+                {
+                    type = (int) InputType.Mouse,
+                    u = new InputUnion
+                    {
+                        mi = new MouseInput
+                        {
+                            dx = dx,
+                            dy = dy,
+                            dwFlags = (uint)(MouseEventF.Move),
+                            dwExtraInfo = GetMessageExtraInfo()
+                        }
+                    }
+                }
+            };
+
+            SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(Input)));
+        }
+
+        public static void HoldKey(string key, int durationMs) {
             Console.WriteLine($"Holding {key} for {durationMs}ms");
             SetKeyState(key: key, isDown: true);
             Thread.Sleep(durationMs);
             SetKeyState(key: key, isDown: false);
+        }
+
+        public static void HoldKeys(string[] keys, int durationMs) {
+            Console.WriteLine($"Holding {String.Join(',', keys)} for {durationMs}ms");
+            foreach (string key in keys) {
+                SetKeyState(key: key, isDown: true);
+            }
+            Thread.Sleep(durationMs);
+            foreach (string key in keys) {
+                SetKeyState(key: key, isDown: false);
+            }
         }
     }
 }

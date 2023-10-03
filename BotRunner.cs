@@ -1,31 +1,72 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace hunt_bot {
     public class BotRunner {
+        [Serializable]
+        public class Config {
+            public enum BotMode {
+                STRAFE_RANDOMLY,
+                STRAFE_PREDICTABLY,
+                SPRINT_PREDICTABLY,
+            }
+
+            [JsonConverter(typeof(JsonStringEnumConverter))]
+            public enum Action {
+                LEFT,
+                RIGHT,
+                FORWARD,
+                SPRINT,
+            }
+
+            public Config() { }
+
+            public int CheckIntervalMs { get; set; } = 1000;
+
+            public Dictionary<Action, string> keyMappings { get; set; } = new() {
+                { Action.LEFT, "Q" },
+                { Action.RIGHT, "D" },
+                { Action.FORWARD, "W" },
+                { Action.SPRINT, "Tab" },
+            };
+            public float mouseSensitivity { get; set; } = 0.28442f;
+
+            [JsonConverter(typeof(JsonStringEnumConverter))]
+            public BotMode Mode { get; set; } = BotMode.STRAFE_RANDOMLY;
+            
+            public int StrafeRandomlyMinDurationMs { get; set; } = 300;
+            public int StrafeRandomlyMaxDurationMs { get; set; } = 1000;
+            
+            public int StrafePredictablyDurationMs { get; set; }
+            
+            public int SpringPredictablyDurationMs { get; set; }
+        }
+
         const string HUNT_WINDOW_TITLE = "Hunt: Showdown";
+        const string CONFIG_FILENAME = "config.json";
 
         private bool isRunning = false;
         private Random random = new Random();
 
         private Bitmap referenceRegionBitmap;
         private Rectangle screenRegionRect;
-        private readonly int checkIntervalMillisec;
         private readonly int maxNormalizedPerPixelDiff;
+        private Config config;
+        private const float SENS_MULT = 9308.85874f;
+        private float turn360Dx;
 
         public BotRunner(
-            int checkIntervalMillisec = 1000,
             int maxNormalizedPerPixelDiff = 20) {
-            this.checkIntervalMillisec = checkIntervalMillisec;
             this.maxNormalizedPerPixelDiff = maxNormalizedPerPixelDiff;
 
             LoadReferenceRegion();
+            this.config = LoadConfig();
+            turn360Dx = SENS_MULT / config.mouseSensitivity;
+            Console.WriteLine($"turn360Dx: {turn360Dx}");
 
             var botRunnerThread = new Thread(new ThreadStart(this.RunBot)) {
                 IsBackground = true,
@@ -42,6 +83,26 @@ namespace hunt_bot {
             isRunning = false;
         }
 
+        private Config LoadConfig() {
+            if (File.Exists(CONFIG_FILENAME)) {
+                var configText = File.ReadAllText(CONFIG_FILENAME);
+                var config = JsonSerializer.Deserialize<Config>(configText);
+                SaveConfig(config);
+                return config;
+            } else {
+                var config = new Config();
+                SaveConfig(config);
+                return config;
+            }
+        }
+
+        private static void SaveConfig(Config config) {
+            var options = new JsonSerializerOptions { WriteIndented = true };
+            var jsonText = JsonSerializer.Serialize(config, options);
+            File.WriteAllText(CONFIG_FILENAME, jsonText);
+        }
+
+        
         private void LoadReferenceRegion() {
             var screenHeight = Screen.PrimaryScreen.Bounds.Height;
             var screenWidth = Screen.PrimaryScreen.Bounds.Width;
@@ -85,7 +146,7 @@ namespace hunt_bot {
                 if (curWindowTitle == HUNT_WINDOW_TITLE) {
                     if (!isRunning) {
                         Console.WriteLine("isRunning: false");
-                        Thread.Sleep(checkIntervalMillisec);
+                        Thread.Sleep(config.CheckIntervalMs);
                         continue;
                     }
 
@@ -106,10 +167,21 @@ namespace hunt_bot {
                         InputSimulator.mouse_event((int)InputSimulator.MouseEventFlags.LeftUp, reviveButtonCenterX, reviveButtonCenterY, 0, 0);
                         Thread.Sleep(1000);
                     } else {
-                        StrafeRandomly(1000);
+                        switch(config.Mode) {
+                            case Config.BotMode.STRAFE_RANDOMLY: 
+                                StrafeRandomly(totalDurationMs: 1000);
+                                break;
+                            case Config.BotMode.STRAFE_PREDICTABLY:
+                                StrafePredictably();
+                                break;
+                            case Config.BotMode.SPRINT_PREDICTABLY:
+                                SprintPredictably();
+                                break;
+                        }
+                        
                     }
                 } else {
-                    Thread.Sleep(checkIntervalMillisec);
+                    Thread.Sleep(config.CheckIntervalMs);
                 }
             }
         }
@@ -175,24 +247,59 @@ namespace hunt_bot {
             return strTitle;
         }
         
-        private void StrafeRandomly(int totalDurationMs, int minDurationMs = 300, int maxDurationMs = 1000) {
+        private void StrafeRandomly(int totalDurationMs) {
             var curDurationMs = 0;
-            int curKey = 0;
+            string curKey;
             if (random.NextSingle() < 0.5) {
-                curKey = InputSimulator.SCAN_CODE_Q;
+                curKey = config.keyMappings[Config.Action.LEFT];
             } else {
-                curKey = InputSimulator.SCAN_CODE_D;
+                curKey = config.keyMappings[Config.Action.RIGHT];
             }
             while (curDurationMs < totalDurationMs) {
-                if (curKey == InputSimulator.SCAN_CODE_D) {
-                    curKey = InputSimulator.SCAN_CODE_Q;
+                if (curKey == config.keyMappings[Config.Action.LEFT]) {
+                    curKey = config.keyMappings[Config.Action.RIGHT];
                 } else {
-                    curKey = InputSimulator.SCAN_CODE_D;
+                    curKey = config.keyMappings[Config.Action.LEFT];
                 }
-                var d = random.Next(minDurationMs, maxDurationMs);
+                var d = random.Next(config.StrafeRandomlyMinDurationMs, config.StrafeRandomlyMaxDurationMs);
                 d = Math.Min(d, totalDurationMs - curDurationMs);
                 curDurationMs += d;
                 InputSimulator.HoldKey(curKey, d);
+            }
+        }
+
+        private void StrafePredictably() {
+            InputSimulator.HoldKey(config.keyMappings[Config.Action.LEFT], config.StrafePredictablyDurationMs);
+            InputSimulator.HoldKey(config.keyMappings[Config.Action.RIGHT], config.StrafePredictablyDurationMs);
+        }
+
+        private void SprintPredictably() {
+            InputSimulator.HoldKeys(
+                new string[] { config.keyMappings[Config.Action.FORWARD], config.keyMappings[Config.Action.SPRINT] },
+                config.SpringPredictablyDurationMs
+            );
+            Thread.Sleep(500);
+            Turn(180);
+            Thread.Sleep(100);
+            InputSimulator.HoldKeys(
+                new string[] { config.keyMappings[Config.Action.FORWARD], config.keyMappings[Config.Action.SPRINT] },
+                config.SpringPredictablyDurationMs
+            );
+            Thread.Sleep(500);
+            Turn(180);
+            Thread.Sleep(100);
+        }
+
+        private void Turn(int degrees) {
+            var totalDx = (int)(turn360Dx * (degrees / 360f));
+            var turnDurationMs = 200;
+            var dxPerCycle = 10;
+            var numCycles = totalDx / dxPerCycle;
+            var sleepPerCycle = turnDurationMs / numCycles;
+            while (totalDx > 0) {
+                InputSimulator.MouseMove(dx: Math.Min(dxPerCycle, totalDx), dy: 0);
+                totalDx -= dxPerCycle;
+                Thread.Sleep(sleepPerCycle);
             }
         }
     }
