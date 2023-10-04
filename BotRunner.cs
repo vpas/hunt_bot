@@ -54,13 +54,14 @@ namespace hunt_bot {
 
         private Bitmap referenceRegionBitmap;
         private Rectangle screenRegionRect;
+        private Rectangle reviveButtonRect;
         private readonly int maxNormalizedPerPixelDiff;
         private Config config;
         private const float SENS_MULT = 9308.85874f;
         private float turn360Dx;
 
         public BotRunner(
-            int maxNormalizedPerPixelDiff = 20) {
+            int maxNormalizedPerPixelDiff = 30) {
             this.maxNormalizedPerPixelDiff = maxNormalizedPerPixelDiff;
 
             LoadReferenceRegion();
@@ -107,22 +108,36 @@ namespace hunt_bot {
             var screenHeight = Screen.PrimaryScreen.Bounds.Height;
             var screenWidth = Screen.PrimaryScreen.Bounds.Width;
             if (screenHeight == 1200 && screenWidth == 1920) {
-                referenceRegionBitmap = Properties.Resources.revive_button_1920_1200;
+                referenceRegionBitmap = Properties.Resources.death_screen_1920_1200_ref_region;
                 screenRegionRect = new Rectangle(
+                    location: new Point(
+                        int.Parse(Properties.Resources.death_screen_ref_region_1920_1200_left_x),
+                        int.Parse(Properties.Resources.death_screen_ref_region_1920_1200_top_y)
+                    ),
+                    size: referenceRegionBitmap.Size
+                );
+                reviveButtonRect = new Rectangle(
                     location: new Point(
                         int.Parse(Properties.Resources.revive_button_1920_1200_left_x),
                         int.Parse(Properties.Resources.revive_button_1920_1200_top_y)
                     ),
-                    size: referenceRegionBitmap.Size
+                    size: Properties.Resources.revive_button_1920_1200.Size
                 );
             } else if (screenHeight == 1080 && screenWidth == 1920) {
-                referenceRegionBitmap = Properties.Resources.revive_button_1920_1080;
+                referenceRegionBitmap = Properties.Resources.death_screen_1920_1080_ref_region;
                 screenRegionRect = new Rectangle(
+                    location: new Point(
+                        int.Parse(Properties.Resources.death_screen_ref_region_1920_1080_left_x),
+                        int.Parse(Properties.Resources.death_screen_ref_region_1920_1080_top_y)
+                    ),
+                    size: referenceRegionBitmap.Size
+                );
+                reviveButtonRect = new Rectangle(
                     location: new Point(
                         int.Parse(Properties.Resources.revive_button_1920_1080_left_x),
                         int.Parse(Properties.Resources.revive_button_1920_1080_top_y)
                     ),
-                    size: referenceRegionBitmap.Size
+                    size: Properties.Resources.revive_button_1920_1080.Size
                 );
             } else {
                 Console.WriteLine($"Unsupported screen Height: {screenHeight}");
@@ -141,16 +156,18 @@ namespace hunt_bot {
                         continue;
                     }
 
+
                     var capturedScreenRegionBitmap = CaptureScreenRegion(screenRegionRect);
                     capturedScreenRegionBitmap = NormalizeBitmap(capturedScreenRegionBitmap);
                     var diff = CalcBitmapDiff(referenceRegionBitmap, capturedScreenRegionBitmap);
                     Console.WriteLine($"RunDetector diff: {diff}");
                     var isPlayerDead = diff <= maxNormalizedPerPixelDiff;
                     Console.WriteLine($"RunDetector newIsPlayerDead: {isPlayerDead}");
+                    
 
                     if (isPlayerDead) {
-                        var reviveButtonCenterX = screenRegionRect.X + screenRegionRect.Width / 2;
-                        var reviveButtonCenterY = screenRegionRect.Y + screenRegionRect.Height / 2;
+                        var reviveButtonCenterX = reviveButtonRect.X + reviveButtonRect.Width / 2;
+                        var reviveButtonCenterY = reviveButtonRect.Y + reviveButtonRect.Height / 2;
                         InputSimulator.SetCursorPos(reviveButtonCenterX, reviveButtonCenterY);
                         Thread.Sleep(100);
                         InputSimulator.mouse_event((int)InputSimulator.MouseEventFlags.LeftDown, reviveButtonCenterX, reviveButtonCenterY, 0, 0);

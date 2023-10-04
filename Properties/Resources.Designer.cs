@@ -63,6 +63,62 @@ namespace hunt_bot.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap death_screen_1920_1080_ref_region {
+            get {
+                object obj = ResourceManager.GetObject("death_screen_1920_1080_ref_region", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap death_screen_1920_1200_ref_region {
+            get {
+                object obj = ResourceManager.GetObject("death_screen_1920_1200_ref_region", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 731.
+        /// </summary>
+        internal static string death_screen_ref_region_1920_1080_left_x {
+            get {
+                return ResourceManager.GetString("death_screen_ref_region_1920_1080_left_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 101.
+        /// </summary>
+        internal static string death_screen_ref_region_1920_1080_top_y {
+            get {
+                return ResourceManager.GetString("death_screen_ref_region_1920_1080_top_y", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 731.
+        /// </summary>
+        internal static string death_screen_ref_region_1920_1200_left_x {
+            get {
+                return ResourceManager.GetString("death_screen_ref_region_1920_1200_left_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 161.
+        /// </summary>
+        internal static string death_screen_ref_region_1920_1200_top_y {
+            get {
+                return ResourceManager.GetString("death_screen_ref_region_1920_1200_top_y", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap revive_button_1920_1080 {
             get {
                 object obj = ResourceManager.GetObject("revive_button_1920_1080", resourceCulture);
@@ -99,7 +155,7 @@ namespace hunt_bot.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 154.
+        ///   Looks up a localized string similar to 713.
         /// </summary>
         internal static string revive_button_1920_1200_left_x {
             get {
@@ -108,7 +164,7 @@ namespace hunt_bot.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 973.
+        ///   Looks up a localized string similar to 969.
         /// </summary>
         internal static string revive_button_1920_1200_top_y {
             get {
