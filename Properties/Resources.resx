@@ -122,7 +122,7 @@
     <value>..\Resources\revive_button_1920_1080.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="revive_button_1920_1080_left_x" xml:space="preserve">
-    <value>434</value>
+    <value>715</value>
   </data>
   <data name="revive_button_1920_1080_top_y" xml:space="preserve">
     <value>910</value>

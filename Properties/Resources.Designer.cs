@@ -71,7 +71,7 @@ namespace hunt_bot.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 434.
+        ///   Looks up a localized string similar to 715.
         /// </summary>
         internal static string revive_button_1920_1080_left_x {
             get {
