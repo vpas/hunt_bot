@@ -115,24 +115,15 @@ namespace hunt_bot {
                     ),
                     size: referenceRegionBitmap.Size
                 );
-                //} else if (screenHeight == 1440) {
-                //    referenceRegionBitmap = Properties.Resources.hunt_death_reference_region_1440p;
-                //    screenRegionRect = new Rectangle(
-                //        location: new Point(
-                //            int.Parse(Properties.Resources.reference_region_1440p_left_x),
-                //            int.Parse(Properties.Resources.reference_region_1440p_top_y)
-                //        ),
-                //        size: referenceRegionBitmap.Size
-                //    );
-                //} else if (screenHeight == 1200) {
-                //    referenceRegionBitmap = Properties.Resources.hunt_death_reference_region_1200p;
-                //    screenRegionRect = new Rectangle(
-                //        location: new Point(
-                //            int.Parse(Properties.Resources.reference_region_1200p_left_x),
-                //            int.Parse(Properties.Resources.reference_region_1200p_top_y)
-                //        ),
-                //        size: referenceRegionBitmap.Size
-                //    );
+            } else if (screenHeight == 1080 && screenWidth == 1920) {
+                referenceRegionBitmap = Properties.Resources.revive_button_1920_1080;
+                screenRegionRect = new Rectangle(
+                    location: new Point(
+                        int.Parse(Properties.Resources.revive_button_1920_1080_left_x),
+                        int.Parse(Properties.Resources.revive_button_1920_1080_top_y)
+                    ),
+                    size: referenceRegionBitmap.Size
+                );
             } else {
                 Console.WriteLine($"Unsupported screen Height: {screenHeight}");
             }

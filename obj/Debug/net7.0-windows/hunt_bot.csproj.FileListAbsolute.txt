@@ -3,7 +3,6 @@ C:\Raven\projects\hunt_bot\bin\Debug\net7.0-windows\hunt_bot.deps.json
 C:\Raven\projects\hunt_bot\bin\Debug\net7.0-windows\hunt_bot.runtimeconfig.json
 C:\Raven\projects\hunt_bot\bin\Debug\net7.0-windows\hunt_bot.dll
 C:\Raven\projects\hunt_bot\bin\Debug\net7.0-windows\hunt_bot.pdb
-C:\Raven\projects\hunt_bot\obj\Debug\net7.0-windows\hunt_bot.csproj.AssemblyReference.cache
 C:\Raven\projects\hunt_bot\obj\Debug\net7.0-windows\hunt_bot.MainForm.resources
 C:\Raven\projects\hunt_bot\obj\Debug\net7.0-windows\hunt_bot.Properties.Resources.resources
 C:\Raven\projects\hunt_bot\obj\Debug\net7.0-windows\hunt_bot.csproj.GenerateResource.cache

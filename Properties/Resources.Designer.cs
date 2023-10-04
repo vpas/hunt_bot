@@ -61,7 +61,17 @@ namespace hunt_bot.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap revive_button_1920_1080 {
+            get {
+                object obj = ResourceManager.GetObject("revive_button_1920_1080", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 434.
         /// </summary>
         internal static string revive_button_1920_1080_left_x {
             get {
@@ -70,7 +80,7 @@ namespace hunt_bot.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to 910.
         /// </summary>
         internal static string revive_button_1920_1080_top_y {
             get {
